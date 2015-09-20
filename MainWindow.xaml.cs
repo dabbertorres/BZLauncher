@@ -82,7 +82,7 @@ namespace BZLauncher
 		{
 			if(mapAuthorSearch.Text.Length != 0)
 			{
-				listBox.ItemsSource = displayMaps = app.Maps.FindAll((Map m) => m.filename.Contains(mapAuthorSearch.Text));
+				listBox.ItemsSource = displayMaps = app.Maps.FindAll((Map m) => m.author.Contains(mapAuthorSearch.Text));
 			}
 			else
 			{
