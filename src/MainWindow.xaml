@@ -6,31 +6,31 @@
         xmlns:local="clr-namespace:BZLauncher"
         xmlns:controls="clr-namespace:Watermark"
         mc:Ignorable="d"
-        Title="BZLauncher" Height="600" Width="800" ScrollViewer.VerticalScrollBarVisibility="Auto">
+        Title="BZLauncher" Height="600" Width="800" Visibility="Visible">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="2*"/>
             <ColumnDefinition Width="2*"/>
             <ColumnDefinition Width="3*"/>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="0.9*"/>
+            <ColumnDefinition Width="1.1*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
-        <ListBox x:Name="listBox" Margin="10,10,10,10" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" HorizontalAlignment="Stretch" SelectionChanged="MapSelectedChange" SelectionMode="Single"/>
+        <ListBox x:Name="listBox" Margin="10,10,10,10" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" HorizontalAlignment="Stretch" SelectionChanged="MapSelectedChange" SelectionMode="Single" AllowDrop="True" Drop="ListBoxDrop"/>
         <Image x:Name="mapImage" Margin="10,10,10,10" Grid.Row="0" Grid.Column="2"/>
         <StackPanel Margin="10,10,0,10" Grid.Row="0" Grid.Column="3">
-            <Label x:Name="mapInfo" Content="Map Info" TextElement.FontWeight="Bold"/>
-            <Label x:Name="mapAuthor" Content="Author: " Padding="2"/>
-            <Label x:Name="mapWorld" Content="World: " Padding="2"/>
-            <Label x:Name="mapSize" Content="Size: " Padding="2"/>
-            <Label x:Name="mapPowerups" Content="Powerups: " Padding="2"/>
-            <Label x:Name="mapGeysers" Content="Geysers: " Padding="2"/>
-            <Label x:Name="mapScrap" Content="Scrap: " Padding="2"/>
-            <Label x:Name="mapType" Content="Type: " Padding="2"/>
-            <Label x:Name="mapVersion" Content="Version: " Padding="2"/>
+            <Label x:Name="mapInfo" Content="Map Info" TextElement.FontWeight="Bold" HorizontalContentAlignment="Center"/>
+            <Label x:Name="mapAuthor" Content="Author: " Padding="2" HorizontalContentAlignment="Right"/>
+            <Label x:Name="mapWorld" Content="World: " Padding="2" HorizontalContentAlignment="Right"/>
+            <Label x:Name="mapSize" Content="Size: " Padding="2" HorizontalContentAlignment="Right"/>
+            <Label x:Name="mapPowerups" Content="Powerups: " Padding="2" HorizontalContentAlignment="Right"/>
+            <Label x:Name="mapGeysers" Content="Geysers: " Padding="2" HorizontalContentAlignment="Right"/>
+            <Label x:Name="mapScrap" Content="Scrap: " Padding="2" HorizontalContentAlignment="Right"/>
+            <Label x:Name="mapType" Content="Type: " Padding="2" HorizontalContentAlignment="Right"/>
+            <Label x:Name="mapVersion" Content="Version: " Padding="2" HorizontalContentAlignment="Right"/>
         </StackPanel>
         <StackPanel Margin="0,10,10,10" Grid.Row="0" Grid.Column="4">
             <Label x:Name="mapInfoOutput" Content="" TextElement.FontWeight="Bold"/>
@@ -45,14 +45,14 @@
         </StackPanel>
         <StackPanel Grid.Column="1" Margin="10,10,10,10" Grid.Row="0">
             <AdornerDecorator>
-                <TextBox x:Name="mapNameSearch" Height="23" TextWrapping="Wrap" Margin="0,0,0,5" TextChanged="MapNameSearch">
+                <TextBox x:Name="mapNameSearch" TextWrapping="Wrap" Margin="0,0,0,5" TextChanged="MapNameSearch">
                     <controls:WatermarkService.Watermark>
                         <TextBlock>Map Name Search</TextBlock>
                     </controls:WatermarkService.Watermark>
                 </TextBox>
             </AdornerDecorator>
             <AdornerDecorator>
-                <TextBox x:Name="mapAuthorSearch" Height="23" TextWrapping="Wrap" Margin="0,0,0,5" TextChanged="MapAuthorSearch">
+                <TextBox x:Name="mapAuthorSearch" TextWrapping="Wrap" Margin="0,0,0,5" TextChanged="MapAuthorSearch">
                     <controls:WatermarkService.Watermark>
                         <TextBlock>Author Name Search</TextBlock>
                     </controls:WatermarkService.Watermark>

@@ -72,7 +72,7 @@ namespace BZLauncher
 			}
 			else
 			{
-				return null;
+				return "Destroy the enemy Recycler.";
 			}
 		}
 

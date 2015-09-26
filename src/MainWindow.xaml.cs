@@ -40,7 +40,7 @@ namespace BZLauncher
 				Map toLoad = displayMaps.ElementAt(listBox.SelectedIndex);
 
 				mapImage.Source = toLoad.Image();
-				mapObjectiveTextBlock.Text = toLoad.Objective() ?? "Destroy the enemy Recycler.";
+				mapObjectiveTextBlock.Text = toLoad.Objective();
 				mapAuthorOutput.Content = toLoad.author;
 				mapWorldOutput.Content = toLoad.world;
 				mapSizeOutput.Content = toLoad.size;
@@ -94,6 +94,18 @@ namespace BZLauncher
 			}
 
 			e.Handled = true;
+		}
+
+		private void ListBoxDrop(object sender, DragEventArgs e)
+		{
+			if(e.Data.GetDataPresent(DataFormats.FileDrop))
+			{
+				string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+				// get zip file, make new folder with zip file name, and extract contents to new folder
+
+				e.Handled = true;
+			}
 		}
 	}
 }
