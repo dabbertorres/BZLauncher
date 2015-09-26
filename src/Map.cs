@@ -55,6 +55,27 @@ namespace BZLauncher
 				return null;
 		}
 
+		public string Objective()
+		{
+			string objFilePath = bznPath + "/" + filename + ".otf";
+
+			if(File.Exists(objFilePath))
+			{
+				string objective = null;
+
+				using(StreamReader sr = new StreamReader(objFilePath))
+				{
+					objective = sr.ReadToEnd();
+				}
+
+				return objective;
+			}
+			else
+			{
+				return null;
+			}
+		}
+
 		public int CompareTo(object obj)
 		{
 			Map other = (Map)obj;

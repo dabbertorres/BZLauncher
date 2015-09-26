@@ -35,17 +35,21 @@ namespace BZLauncher
 
 		private void MapSelectedChange(object sender, SelectionChangedEventArgs e)
 		{
-			Map toLoad = app.GetMapAt(listBox.SelectedIndex);
+			if(0 <= listBox.SelectedIndex && listBox.SelectedIndex < app.Maps.Count)
+			{
+				Map toLoad = displayMaps.ElementAt(listBox.SelectedIndex);
 
-			mapImage.Source = toLoad.Image();
-			mapAuthorOutput.Content = toLoad.author;
-			mapWorldOutput.Content = toLoad.world;
-			mapSizeOutput.Content = toLoad.size;
-			mapPowerupsOutput.Content = toLoad.powerups.ToString();
-			mapGeysersOutput.Content = toLoad.geysers.ToString();
-			mapScrapOutput.Content = toLoad.scrap.ToString();
-			mapTypeOutput.Content = toLoad.type;
-			mapVersionOutput.Content = toLoad.version;
+				mapImage.Source = toLoad.Image();
+				mapObjectiveTextBlock.Text = toLoad.Objective() ?? "Destroy the enemy Recycler.";
+				mapAuthorOutput.Content = toLoad.author;
+				mapWorldOutput.Content = toLoad.world;
+				mapSizeOutput.Content = toLoad.size;
+				mapPowerupsOutput.Content = toLoad.powerups.ToString();
+				mapGeysersOutput.Content = toLoad.geysers.ToString();
+				mapScrapOutput.Content = toLoad.scrap.ToString();
+				mapTypeOutput.Content = toLoad.type;
+				mapVersionOutput.Content = toLoad.version;
+			}
 
 			e.Handled = true;
 		}

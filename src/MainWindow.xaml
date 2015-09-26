@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:BZLauncher"
         xmlns:controls="clr-namespace:Watermark"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="800">
+        Title="BZLauncher" Height="600" Width="800" ScrollViewer.VerticalScrollBarVisibility="Auto">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="3*"/>
@@ -23,25 +23,25 @@
         <Image x:Name="mapImage" Margin="10,10,10,10" Grid.Row="0" Grid.Column="2"/>
         <StackPanel Margin="10,10,0,10" Grid.Row="0" Grid.Column="3">
             <Label x:Name="mapInfo" Content="Map Info" TextElement.FontWeight="Bold"/>
-            <Label x:Name="mapAuthor" Content="Author: "/>
-            <Label x:Name="mapWorld" Content="World: "/>
-            <Label x:Name="mapSize" Content="Size: "/>
-            <Label x:Name="mapPowerups" Content="Powerups: "/>
-            <Label x:Name="mapGeysers" Content="Geysers: "/>
-            <Label x:Name="mapScrap" Content="Scrap: "/>
-            <Label x:Name="mapType" Content="Type: "/>
-            <Label x:Name="mapVersion" Content="Version: "/>
+            <Label x:Name="mapAuthor" Content="Author: " Padding="2"/>
+            <Label x:Name="mapWorld" Content="World: " Padding="2"/>
+            <Label x:Name="mapSize" Content="Size: " Padding="2"/>
+            <Label x:Name="mapPowerups" Content="Powerups: " Padding="2"/>
+            <Label x:Name="mapGeysers" Content="Geysers: " Padding="2"/>
+            <Label x:Name="mapScrap" Content="Scrap: " Padding="2"/>
+            <Label x:Name="mapType" Content="Type: " Padding="2"/>
+            <Label x:Name="mapVersion" Content="Version: " Padding="2"/>
         </StackPanel>
         <StackPanel Margin="0,10,10,10" Grid.Row="0" Grid.Column="4">
             <Label x:Name="mapInfoOutput" Content="" TextElement.FontWeight="Bold"/>
-            <Label x:Name="mapAuthorOutput" Content=""/>
-            <Label x:Name="mapWorldOutput" Content=""/>
-            <Label x:Name="mapSizeOutput" Content=""/>
-            <Label x:Name="mapPowerupsOutput" Content=""/>
-            <Label x:Name="mapGeysersOutput" Content=""/>
-            <Label x:Name="mapScrapOutput" Content=""/>
-            <Label x:Name="mapTypeOutput" Content=""/>
-            <Label x:Name="mapVersionOutput" Content=""/>
+            <Label x:Name="mapAuthorOutput" Content="" Padding="2"/>
+            <Label x:Name="mapWorldOutput" Content="" Padding="2"/>
+            <Label x:Name="mapSizeOutput" Content="" Padding="2"/>
+            <Label x:Name="mapPowerupsOutput" Content="" Padding="2"/>
+            <Label x:Name="mapGeysersOutput" Content="" Padding="2"/>
+            <Label x:Name="mapScrapOutput" Content="" Padding="2"/>
+            <Label x:Name="mapTypeOutput" Content="" Padding="2"/>
+            <Label x:Name="mapVersionOutput" Content="" Padding="2"/>
         </StackPanel>
         <StackPanel Grid.Column="1" Margin="10,10,10,10" Grid.Row="0">
             <AdornerDecorator>
@@ -62,10 +62,14 @@
             <CheckBox x:Name="checkBoxDM" Content="Deathmatch" Margin="0,0,0,5"/>
             <CheckBox x:Name="checkBoxIA" Content="Instant Action" Margin="0,0,0,5"/>
         </StackPanel>
-        <StackPanel Margin="10,10,10,10" Grid.ColumnSpan="2" Grid.Row="1" Grid.Column="3" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+        <StackPanel Margin="10,10,10,10" Grid.Row="1" Grid.Column="3" VerticalAlignment="Bottom" Grid.ColumnSpan="2" HorizontalAlignment="Right">
             <CheckBox x:Name="checkBoxEditOn" Content="Edit" Margin="0,0,0,5" Checked="EditChecked" Unchecked="EditUnchecked"/>
             <CheckBox x:Name="checkBoxStartEditOn" Content="Start Edit" Margin="0,0,0,5" IsEnabled="False"/>
             <Button x:Name="button" Content="Launch"/>
         </StackPanel>
+        <DockPanel Grid.Column="2" Margin="10" Grid.Row="1" UseLayoutRounding="False">
+            <Label x:Name="mapObjectiveLabel" Content="Objective:" Padding="2" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Disabled" VerticalAlignment="Top" DockPanel.Dock="Top"/>
+            <TextBox x:Name="mapObjectiveTextBlock" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" BorderThickness="0" IsTabStop="False" AllowDrop="False" UndoLimit="0" IsReadOnly="True" ScrollViewer.CanContentScroll="True" ClipToBounds="True" UseLayoutRounding="False" Margin="0"/>
+        </DockPanel>
     </Grid>
 </Window>
