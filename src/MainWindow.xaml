@@ -58,9 +58,6 @@
                     </controls:WatermarkService.Watermark>
                 </TextBox>
             </AdornerDecorator>
-            <CheckBox x:Name="checkBoxST" Content="Strategy" Margin="0,0,0,5"/>
-            <CheckBox x:Name="checkBoxDM" Content="Deathmatch" Margin="0,0,0,5"/>
-            <CheckBox x:Name="checkBoxIA" Content="Instant Action" Margin="0,0,0,5"/>
         </StackPanel>
         <StackPanel Margin="10,10,10,10" Grid.Row="1" Grid.Column="3" VerticalAlignment="Bottom" Grid.ColumnSpan="2" HorizontalAlignment="Right">
             <CheckBox x:Name="checkBoxEditOn" Content="Edit" Margin="0,0,0,5" Checked="EditChecked" Unchecked="EditUnchecked"/>

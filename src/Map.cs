@@ -12,7 +12,7 @@ namespace BZLauncher
 			Strategy,
 			Deathmatch,
 			InstantAction,
-			Unknown
+			Unknown,
 		}
 		
 		// path to folder containing map files
@@ -23,7 +23,7 @@ namespace BZLauncher
 
 		public string author;
 		public string version;
-		public string type;
+		public Type type;
 
 		public string world;
 		public string size;
@@ -37,7 +37,7 @@ namespace BZLauncher
 			filename = null;
 			author = "Unknown";
 			version = "1.0";
-			type = "Unknown";
+			type = Type.Unknown;
 			world = "Unknown";
 			size = "Unknown";
 			powerups = false;

@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.Win32;
@@ -88,7 +89,12 @@ namespace BZLauncher
 
 			foreach(string b in bzns)
 			{
-				ret.Add(LoadMap(b.Substring(0, b.LastIndexOf('.'))));
+				Map m = LoadMap(b.Substring(0, b.LastIndexOf('.')));
+
+				if(m != null)
+				{
+					ret.Add(m);
+				}
 			}
 
 			return ret;
@@ -98,6 +104,7 @@ namespace BZLauncher
 		{
 			string desFile = path + ".des";
 			string trnFile = path + ".trn";
+			string bznFile = path + ".bzn";
 
 			Map ret = new Map();
 			ret.bznPath = path.Substring(0, path.LastIndexOfAny(new char[] {'/', '\\'}));
@@ -109,67 +116,156 @@ namespace BZLauncher
 			
 			if(File.Exists(desFile))
 			{
-				using(StreamReader sr = new StreamReader(desFile))
+				ParseDes(desFile, ref ret);
+			}
+			else if(File.Exists(trnFile))
+			{
+				ParseTrn(trnFile, ref ret);
+			}
+
+			ParseBzn(bznFile, ref ret);
+
+			if(ret.type != Map.Type.InstantAction)
+			{
+				return null;
+			}
+			else
+			{
+				return ret;
+			}
+		}
+
+		// functions to read des, trn, bzn, etc files
+
+		private void ParseDes(string file, ref Map map)
+		{
+			using(StreamReader sr = new StreamReader(file))
+			{
+				string line = null;
+
+				while((line = sr.ReadLine()) != null)
 				{
-					string line = null;
+					int colonIdx = line.IndexOf(':');
 
-					while((line = sr.ReadLine()) != null)
+					if(colonIdx != -1 && line.Length > colonIdx)
 					{
-						int colonIdx = line.IndexOf(':');
+						string key = line.Substring(0, colonIdx).Trim();
+						string value = line.Substring(colonIdx + 1).Trim();
 
-                        if(colonIdx != -1 && line.Length > colonIdx)
+						if(value.Length == 0)
 						{
-							string key = line.Substring(0, colonIdx).Trim();
-							string value = line.Substring(colonIdx + 1).Trim();
+							continue;
+						}
 
-							if(value.Length == 0)
-								continue;
-							
-							switch(key)
+						switch(key)
+						{
+							case "WORLD":
+								map.world = value;
+								break;
+
+							case "SIZE":
+								map.size = value;
+								break;
+
+							case "POWERUPS":
+								map.powerups = value == "Yes";
+								break;
+
+							case "GEYSERS":
+								map.geysers = uint.Parse(value);
+								break;
+
+							case "SCRAP":
+								map.scrap = uint.Parse(value);
+								break;
+
+							case "AUTHOR":
+								map.author = value;
+								break;
+
+							case "VERSION":
+								map.version = value;
+								break;
+
+							default:
+								break;
+						}
+					}
+				}
+			}
+		}
+
+		private void ParseTrn(string file, ref Map map)
+		{
+			
+		}
+
+		private void ParseBzn(string file, ref Map map)
+		{
+			byte[] mission = System.Text.Encoding.ASCII.GetBytes("Mission");
+
+			using(FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read))
+			{
+				using(BinaryReader br = new BinaryReader(fs))
+				{
+					List<byte> bytes = br.ReadBytes((int)fs.Length).ToList();
+					
+					// don't check the last 6 bytes. "Mission" is 7 bytes
+					for(int i = 0; i < bytes.Count - (mission.Length - 1); ++i)
+					{
+						if(bytes[i] == mission[0])
+						{
+							bool foundMission = true;
+
+							for(int j = 1; j < mission.Length; ++j)
 							{
-								case "WORLD":
-									ret.world = value;
+								if(bytes[i + j] != mission[j])
+								{
+									foundMission = false;
 									break;
+								}
+							}
 
-								case "SIZE":
-									ret.size = value;
-									break;
+							if(foundMission)
+							{
+								string prefix = System.Text.Encoding.ASCII.GetString(bytes.GetRange(i - 6, 6).ToArray());
 
-								case "POWERUPS":
-									ret.powerups = value == "Yes";
-									break;
+								switch(prefix)
+								{
+									case "MultST":
+										map.type = Map.Type.Strategy;
+										break;
 
-								case "GEYSERS":
-									ret.geysers = uint.Parse(value);
-									break;
+									case "MultDM":
+										map.type = Map.Type.Deathmatch;
+										break;
 
-								case "SCRAP":
-									ret.scrap = uint.Parse(value);
-									break;
+									case "Inst4X":
+										map.type = Map.Type.InstantAction;
+										break;
 
-								case "AUTHOR":
-									ret.author = value;
-									break;
+									default:
+										if(prefix.Substring(1) == "Empty")
+										{
+											map.type = Map.Type.InstantAction;
+										}
+										else if(prefix.Substring(3) == "Lua")
+										{
+											map.type = Map.Type.InstantAction;
+										}
+										else
+										{
+											map.type = Map.Type.Unknown;
+										}
+										break;
+								}
 
-								case "VERSION":
-									ret.version = value;
-									break;
-
-								default:
-									break;
+								break;
 							}
 						}
 					}
 				}
 			}
-			else if(File.Exists(trnFile))
-			{
-				// do nothing for now
-			}
-
-			return ret;
 		}
-
-		// functions to read des, trn, bzn, etc files
 	}
 }
