@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading;
 using System.IO;
 using System.IO.Compression;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 
 namespace BZLauncher
 {
@@ -52,6 +51,12 @@ namespace BZLauncher
 				if(bznName == null)
 				{
 					// couldn't find a bzn in the zip!
+					/*Popup pop = new Popup();
+					Button b = new Button();
+					b.Content = "Zip file, " + zipFile + " does not contain a .bzn!";
+					pop.Child = b;
+					pop.IsOpen = true;*/
+					
 					return;
 				}
 
