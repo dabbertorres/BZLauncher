@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -23,6 +23,8 @@ namespace BZLauncher
 		private App app;
 
 		private List<Map> displayMaps;
+
+		private object loadingMaps = new object();
 
 		public MainWindow()
 		{
@@ -103,6 +105,16 @@ namespace BZLauncher
 				string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
 
 				// get zip file, make new folder with zip file name, and extract contents to new folder
+				foreach(string f in files)
+				{
+					new MapInstaller(f).loadMapsSignal += () =>
+					{
+						lock (loadingMaps)
+						{
+							Dispatcher.Invoke(() => listBox.ItemsSource = displayMaps = app.LoadMaps());
+						}
+					};
+				}
 
 				e.Handled = true;
 			}

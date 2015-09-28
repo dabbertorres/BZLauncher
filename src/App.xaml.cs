@@ -24,6 +24,16 @@ namespace BZLauncher
 
 		private List<Map> maps;
 
+		public string DirectoryPath
+		{
+			get { return bzDirectoryPath; }
+		}
+
+		public string AddonPath
+		{
+			get { return bzAddonPath; }
+		}
+
 		public List<Map> Maps
 		{
 			get { return maps; }
@@ -89,11 +99,18 @@ namespace BZLauncher
 
 			foreach(string b in bzns)
 			{
-				Map m = LoadMap(b.Substring(0, b.LastIndexOf('.')));
+				Map test = new Map();
+				test.filename = Path.GetFileNameWithoutExtension(b);
 
-				if(m != null)
+				// if we've already loaded the map, don't load it again
+				if(maps == null || (maps != null && !maps.Contains(test)))
 				{
-					ret.Add(m);
+					Map m = LoadMap(b.Substring(0, b.LastIndexOf('.')));
+
+					if(m != null)
+					{
+						ret.Add(m);
+					}
 				}
 			}
 

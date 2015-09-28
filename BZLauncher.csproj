@@ -78,6 +78,8 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -97,6 +99,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="src\Map.cs" />
+    <Compile Include="src\MapInstaller.cs" />
     <Compile Include="src\Watermark\WatermarkAdorner.cs" />
     <Compile Include="src\Watermark\WatermarkService.cs" />
     <Page Include="src\MainWindow.xaml">
