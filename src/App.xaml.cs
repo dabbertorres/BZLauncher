@@ -6,9 +6,6 @@ using Microsoft.Win32;
 
 namespace BZLauncher
 {
-	/// <summary>
-	/// Interaction logic for App.xaml
-	/// </summary>
 	public partial class App : Application
 	{
 		private const string BZ_REG_KEY = "SOFTWARE\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{B3B61934-313A-44A2-B589-700FDAA6C758}_is1";
@@ -22,6 +19,13 @@ namespace BZLauncher
 		public string DirectoryPath
 		{
 			get { return bzDirectoryPath; }
+
+			set
+			{
+				bzDirectoryPath = value;
+				bzExePath = bzDirectoryPath + "/bzone.exe";
+				bzAddonPath = bzDirectoryPath + "/addon";
+			}
 		}
 
 		public string AddonPath
@@ -36,26 +40,36 @@ namespace BZLauncher
 
 		public App()
 		{
-			// should ask for write access just in case we need to set it (if it doesn't already exist and we get a path from the user)
-			// another option would be to create our own key that doesn't require admin access to write to (in CurrentUser), and only ever
-			// read from the BZ uninstall key if our key does not exist
-			using(RegistryKey bzkey = Registry.LocalMachine.OpenSubKey(BZ_REG_KEY))
-			{
-				if(bzkey != null)
-				{
-					bzDirectoryPath = bzkey.GetValue("InstallLocation") as string;
-					bzExePath = bzDirectoryPath + "bzone.exe";
-					bzAddonPath = bzDirectoryPath + "addon";
+			bool promptForPath = true;
 
-					if(!File.Exists(bzExePath))
+			if(BZLauncher.Properties.Settings.Default.BzonePath == null || BZLauncher.Properties.Settings.Default.BzonePath.Length == 0)
+			{
+				using(RegistryKey bzkey = Registry.LocalMachine.OpenSubKey(BZ_REG_KEY))
+				{
+					if(bzkey != null)
 					{
-						// pop up window asking user to give the path to BZ
+						bzDirectoryPath = bzkey.GetValue("InstallLocation") as string;
+						bzExePath = bzDirectoryPath + "/bzone.exe";
+						bzAddonPath = bzDirectoryPath + "/addon";
+
+						promptForPath = false;
 					}
 				}
-				else
-				{
-					// pop up window asking user to give the path to BZ
-				}
+			}
+			else
+			{
+				bzDirectoryPath = BZLauncher.Properties.Settings.Default.BzonePath;
+				bzExePath = bzDirectoryPath + "/bzone.exe";
+				bzAddonPath = bzDirectoryPath + "/addon";
+
+				promptForPath = false;
+			}
+
+			if(promptForPath)
+			{
+				bzExePath = FindBzExeDialog.GetPath();
+				bzDirectoryPath = bzExePath.Substring(0, bzExePath.LastIndexOfAny(new char[] { '/', '\\' }));
+				bzAddonPath = bzDirectoryPath + "/addon";
 			}
 		}
 
@@ -74,9 +88,12 @@ namespace BZLauncher
 			return maps;
 		}
 
-		public void PromptForPath()
+		public void LoadMapAt(string path)
 		{
-			
+			maps.AddRange(FindMapsInDir(path));
+
+			// alphabetical order
+			maps.Sort((Map one, Map two) => one.CompareTo(two));
 		}
 
 		private List<Map> FindMapsInDir(string path)

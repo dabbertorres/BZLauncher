@@ -5,9 +5,6 @@ using System.Windows.Controls;
 
 namespace BZLauncher
 {
-	/// <summary>
-	/// Interaction logic for MainWindow.xaml
-	/// </summary>
 	public partial class MainWindow : Window
 	{
 		private App app;
@@ -39,7 +36,7 @@ namespace BZLauncher
 				mapPowerupsOutput.Content = toLoad.powerups.ToString();
 				mapGeysersOutput.Content = toLoad.geysers.ToString();
 				mapScrapOutput.Content = toLoad.scrap.ToString();
-				mapTypeOutput.Content = toLoad.type;
+				mapTypeOutput.Content = toLoad.type == Map.Type.InstantAction ? "Instant Action" : toLoad.type.ToString();
 				mapVersionOutput.Content = toLoad.version;
 			}
 
@@ -97,17 +94,58 @@ namespace BZLauncher
 				// get zip file, make new folder with zip file name, and extract contents to new folder
 				foreach(string f in files)
 				{
-					new MapInstaller(f).loadMapsSignal += () =>
+					new MapInstaller(f).loadMapsSignal += (string path) =>
 					{
-						lock (loadingMaps)
+						Dispatcher.Invoke(() =>
 						{
-							Dispatcher.Invoke(() => listBox.ItemsSource = displayMaps = app.LoadMaps());
-						}
+							lock (loadingMaps)
+							{
+								app.LoadMapAt(path);
+								listBox.ItemsSource = displayMaps = app.Maps;
+							}
+						});
 					};
 				}
 
 				e.Handled = true;
 			}
 		}
-	}
+
+		private void AppExitClick(object sender, RoutedEventArgs e)
+		{
+			e.Handled = true;
+
+			Close();
+		}
+
+		private void ChangeBzonePathClick(object sender, RoutedEventArgs e)
+		{
+			string path = FindBzExeDialog.GetPath();
+			app.DirectoryPath = path.Substring(0, path.LastIndexOfAny(new char[] { '/', '\\' }));
+
+			RefreshMapListClick(null, e);
+
+			e.Handled = true;
+        }
+
+		private void AboutClick(object sender, RoutedEventArgs e)
+		{
+			// TODO
+
+			e.Handled = true;
+		}
+
+		private void RefreshMapListClick(object sender, RoutedEventArgs e)
+		{
+			Dispatcher.Invoke(() =>
+			{
+				lock (loadingMaps)
+				{
+					listBox.ItemsSource = displayMaps = app.LoadMaps();
+				}
+			});
+
+			e.Handled = true;
+		}
+    }
 }

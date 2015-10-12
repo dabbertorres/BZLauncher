@@ -16,12 +16,25 @@
             <ColumnDefinition Width="1.1*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="1*"/>
-            <RowDefinition Height="1*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
-        <ListBox x:Name="listBox" Margin="10,10,10,10" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" HorizontalAlignment="Stretch" SelectionChanged="MapSelectedChange" SelectionMode="Single" AllowDrop="True" Drop="ListBoxDrop"/>
-        <Image x:Name="mapImage" Margin="10,10,10,10" Grid.Row="0" Grid.Column="2"/>
-        <StackPanel Margin="10,10,0,10" Grid.Row="0" Grid.Column="3">
+        <Menu x:Name="menu" Grid.ColumnSpan="5">
+            <MenuItem Header="File">
+                <MenuItem x:Name="RefreshMapList" Header="Refresh Maps" Click="RefreshMapListClick"/>
+                <MenuItem x:Name="AppExit" Header="Exit" Click="AppExitClick"/>
+            </MenuItem>
+            <MenuItem Header="Tools">
+                <MenuItem x:Name="ChangeBzonePath" Header="Change BZ Path" Click="ChangeBzonePathClick"/>
+            </MenuItem>
+            <MenuItem Header="Help">
+                <MenuItem x:Name="About" Header="About" Click="AboutClick"/>
+            </MenuItem>
+        </Menu>
+        <ListBox x:Name="listBox" Margin="10,10,10,10" Grid.Row="1" Grid.Column="0" Grid.RowSpan="2" HorizontalAlignment="Stretch" SelectionChanged="MapSelectedChange" SelectionMode="Single" AllowDrop="True" Drop="ListBoxDrop"/>
+        <Image x:Name="mapImage" Margin="10,10,10,10" Grid.Row="1" Grid.Column="2"/>
+        <StackPanel Margin="10,10,0,10" Grid.Row="1" Grid.Column="3">
             <Label x:Name="mapInfo" Content="Map Info" TextElement.FontWeight="Bold" HorizontalContentAlignment="Center"/>
             <Label x:Name="mapAuthor" Content="Author: " Padding="2" HorizontalContentAlignment="Right"/>
             <Label x:Name="mapWorld" Content="World: " Padding="2" HorizontalContentAlignment="Right"/>
@@ -32,7 +45,7 @@
             <Label x:Name="mapType" Content="Type: " Padding="2" HorizontalContentAlignment="Right"/>
             <Label x:Name="mapVersion" Content="Version: " Padding="2" HorizontalContentAlignment="Right"/>
         </StackPanel>
-        <StackPanel Margin="0,10,10,10" Grid.Row="0" Grid.Column="4">
+        <StackPanel Margin="0,10,10,10" Grid.Row="1" Grid.Column="4">
             <Label x:Name="mapInfoOutput" Content="" TextElement.FontWeight="Bold"/>
             <Label x:Name="mapAuthorOutput" Content="" Padding="2"/>
             <Label x:Name="mapWorldOutput" Content="" Padding="2"/>
@@ -43,7 +56,7 @@
             <Label x:Name="mapTypeOutput" Content="" Padding="2"/>
             <Label x:Name="mapVersionOutput" Content="" Padding="2"/>
         </StackPanel>
-        <StackPanel Grid.Column="1" Margin="10,10,10,10" Grid.Row="0">
+        <StackPanel Grid.Column="1" Margin="10,10,10,10" Grid.Row="1">
             <AdornerDecorator>
                 <TextBox x:Name="mapNameSearch" TextWrapping="Wrap" Margin="0,0,0,5" TextChanged="MapNameSearch">
                     <controls:WatermarkService.Watermark>
@@ -59,12 +72,12 @@
                 </TextBox>
             </AdornerDecorator>
         </StackPanel>
-        <StackPanel Margin="10,10,10,10" Grid.Row="1" Grid.Column="3" VerticalAlignment="Bottom" Grid.ColumnSpan="2" HorizontalAlignment="Right">
+        <StackPanel Margin="10,10,10,10" Grid.Row="2" Grid.Column="3" VerticalAlignment="Bottom" Grid.ColumnSpan="2" HorizontalAlignment="Right">
             <CheckBox x:Name="checkBoxEditOn" Content="Edit" Margin="0,0,0,5" Checked="EditChecked" Unchecked="EditUnchecked"/>
             <CheckBox x:Name="checkBoxStartEditOn" Content="Start Edit" Margin="0,0,0,5" IsEnabled="False"/>
             <Button x:Name="button" Content="Launch"/>
         </StackPanel>
-        <DockPanel Grid.Column="2" Margin="10" Grid.Row="1" UseLayoutRounding="False">
+        <DockPanel Grid.Column="2" Margin="10" Grid.Row="2" UseLayoutRounding="False">
             <Label x:Name="mapObjectiveLabel" Content="Objective:" Padding="2" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Disabled" VerticalAlignment="Top" DockPanel.Dock="Top"/>
             <TextBox x:Name="mapObjectiveTextBlock" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" BorderThickness="0" IsTabStop="False" AllowDrop="False" UndoLimit="0" IsReadOnly="True" ScrollViewer.CanContentScroll="True" ClipToBounds="True" UseLayoutRounding="False" Margin="0"/>
         </DockPanel>
