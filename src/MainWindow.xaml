@@ -23,10 +23,8 @@
         <Menu x:Name="menu" Grid.ColumnSpan="5">
             <MenuItem Header="File">
                 <MenuItem x:Name="RefreshMapList" Header="Refresh Maps" Click="RefreshMapListClick"/>
-                <MenuItem x:Name="AppExit" Header="Exit" Click="AppExitClick"/>
-            </MenuItem>
-            <MenuItem Header="Tools">
                 <MenuItem x:Name="ChangeBzonePath" Header="Change BZ Path" Click="ChangeBzonePathClick"/>
+                <MenuItem x:Name="AppExit" Header="Exit" Click="AppExitClick"/>
             </MenuItem>
             <MenuItem Header="Help">
                 <MenuItem x:Name="About" Header="About" Click="AboutClick"/>

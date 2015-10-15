@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using Microsoft.Win32;
 
@@ -8,13 +9,20 @@ namespace BZLauncher
 {
 	public partial class App : Application
 	{
+		// notify listeners about BZ Path change
+		public delegate void BzonePathChanged(string path);
+		public event BzonePathChanged bzonePathChanged;
+		
 		private const string BZ_REG_KEY = "SOFTWARE\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{B3B61934-313A-44A2-B589-700FDAA6C758}_is1";
 
+		private readonly byte[] MISSION_BYTES = System.Text.Encoding.ASCII.GetBytes("Mission");
+		
 		private string bzDirectoryPath;
 		private string bzExePath;
 		private string bzAddonPath;
 
 		private List<Map> maps;
+		private readonly object MAPS_LOCK = new object();
 
 		public string DirectoryPath
 		{
@@ -25,7 +33,10 @@ namespace BZLauncher
 				bzDirectoryPath = value;
 				bzExePath = bzDirectoryPath + "/bzone.exe";
 				bzAddonPath = bzDirectoryPath + "/addon";
-			}
+
+				if(bzonePathChanged != null)
+					bzonePathChanged.Invoke(bzDirectoryPath);
+            }
 		}
 
 		public string AddonPath
@@ -40,93 +51,98 @@ namespace BZLauncher
 
 		public App()
 		{
+			// listen for newly installed maps
+			MapInstaller.loadMapsSignal += LoadMaps;
+
 			bool promptForPath = true;
 
+			// if our Settings' BzonePath string does not exist, check the registry for a BZ install location
 			if(BZLauncher.Properties.Settings.Default.BzonePath == null || BZLauncher.Properties.Settings.Default.BzonePath.Length == 0)
 			{
 				using(RegistryKey bzkey = Registry.LocalMachine.OpenSubKey(BZ_REG_KEY))
 				{
 					if(bzkey != null)
 					{
-						bzDirectoryPath = bzkey.GetValue("InstallLocation") as string;
-						bzExePath = bzDirectoryPath + "/bzone.exe";
-						bzAddonPath = bzDirectoryPath + "/addon";
+						string installLocation = bzkey.GetValue("InstallLocation") as string;
 
-						promptForPath = false;
+						if(installLocation != null && installLocation.Length != 0)
+						{
+							DirectoryPath = installLocation;
+
+							promptForPath = false;
+						}
 					}
 				}
 			}
+			// otherwise, it does exist, so use it
 			else
 			{
-				bzDirectoryPath = BZLauncher.Properties.Settings.Default.BzonePath;
-				bzExePath = bzDirectoryPath + "/bzone.exe";
-				bzAddonPath = bzDirectoryPath + "/addon";
+				if(BZLauncher.Properties.Settings.Default.BzonePath.LastIndexOf('.') >= BZLauncher.Properties.Settings.Default.BzonePath.Length - 5)
+					BZLauncher.Properties.Settings.Default.BzonePath = BZLauncher.Properties.Settings.Default.BzonePath.Substring(0, BZLauncher.Properties.Settings.Default.BzonePath.LastIndexOfAny(new char[] { '/', '\\' }));
+
+                DirectoryPath = BZLauncher.Properties.Settings.Default.BzonePath;
 
 				promptForPath = false;
 			}
 
+			// if we didn't have a BzonePath setting, and we couldn't find a path in the registry, ask the user for a path
 			if(promptForPath)
 			{
-				bzExePath = FindBzExeDialog.GetPath();
-				bzDirectoryPath = bzExePath.Substring(0, bzExePath.LastIndexOfAny(new char[] { '/', '\\' }));
-				bzAddonPath = bzDirectoryPath + "/addon";
+				string path = FindBzExeDialog.GetPath();
+
+				if(path == null)
+				{
+					MessageBox.Show("No path, exiting.");
+					Shutdown();
+				}
+
+				DirectoryPath = path;
 			}
+
+			maps = new List<Map>();
 		}
 
-		public Map GetMapAt(int idx)
+		public void LoadMaps(string path = null)
 		{
-			return maps[idx];
-		}
-
-		public List<Map> LoadMaps()
-		{
-			maps = FindMapsInDir(bzAddonPath);
+			// reloading from addon path
+			if(path == null)
+				maps.Clear();
+			
+			// block until all Threads finish
+			using(CountdownEvent cntDwn = new CountdownEvent(1))
+			{
+				FindMapsInDir(path ?? bzAddonPath, cntDwn);
+				cntDwn.Wait();
+			}
 
 			// alphabetical order
-			maps.Sort((Map one, Map two) => one.CompareTo(two));
-
-			return maps;
+			maps.Sort((one, two) => one.CompareTo(two));
 		}
 
-		public void LoadMapAt(string path)
+		private void FindMapsInDir(string path, CountdownEvent cntDwn)
 		{
-			maps.AddRange(FindMapsInDir(path));
-
-			// alphabetical order
-			maps.Sort((Map one, Map two) => one.CompareTo(two));
-		}
-
-		private List<Map> FindMapsInDir(string path)
-		{
-			List<Map> ret = new List<Map>();
-
 			var dirs = Directory.EnumerateDirectories(path);
 			
 			foreach(string d in dirs)
 			{
-				ret.AddRange(FindMapsInDir(d));
+				cntDwn.AddCount();
+				ThreadPool.QueueUserWorkItem(o => FindMapsInDir(d, cntDwn));
 			}
 
 			var bzns = Directory.EnumerateFiles(path, "*.bzn");
 
 			foreach(string b in bzns)
 			{
-				Map test = new Map();
-				test.filename = Path.GetFileNameWithoutExtension(b);
+				Map m = LoadMap(b.Substring(0, b.LastIndexOf('.')));
 
-				// if we've already loaded the map, don't load it again
-				if(maps == null || (maps != null && !maps.Contains(test)))
+				lock(MAPS_LOCK)
 				{
-					Map m = LoadMap(b.Substring(0, b.LastIndexOf('.')));
-
 					if(m != null)
-					{
-						ret.Add(m);
-					}
+						maps.Add(m);
 				}
 			}
 
-			return ret;
+			cntDwn.Signal();
 		}
 
 		private Map LoadMap(string path)
@@ -138,35 +154,20 @@ namespace BZLauncher
 			Map ret = new Map();
 			ret.bznPath = path.Substring(0, path.LastIndexOfAny(new char[] {'/', '\\'}));
 			ret.filename = Path.GetFileNameWithoutExtension(path);
-
-			// if we already have this Map loaded, don't load it, and return null
-			//if(maps.Contains(ret))
-			//	return null;
 			
 			if(File.Exists(desFile))
-			{
-				ParseDes(desFile, ref ret);
-			}
+				ParseDes(desFile, ret);
 			else if(File.Exists(trnFile))
-			{
-				ParseTrn(trnFile, ref ret);
-			}
+				ParseTrn(trnFile, ret);
 
-			ParseBzn(bznFile, ref ret);
+			ParseBzn(bznFile, ret);
 
-			if(ret.type != Map.Type.InstantAction)
-			{
-				return null;
-			}
-			else
-			{
-				return ret;
-			}
+			return ret.type == Map.Type.InstantAction ? ret : null;
 		}
 
 		// functions to read des, trn, bzn, etc files
 
-		private void ParseDes(string file, ref Map map)
+		private void ParseDes(string file, Map map)
 		{
 			using(StreamReader sr = new StreamReader(file))
 			{
@@ -182,9 +183,7 @@ namespace BZLauncher
 						string value = line.Substring(colonIdx + 1).Trim();
 
 						if(value.Length == 0)
-						{
 							continue;
-						}
 
 						switch(key)
 						{
@@ -224,15 +223,13 @@ namespace BZLauncher
 			}
 		}
 
-		private void ParseTrn(string file, ref Map map)
+		private void ParseTrn(string file, Map map)
 		{
 			
 		}
 
-		private void ParseBzn(string file, ref Map map)
+		private void ParseBzn(string file, Map map)
 		{
-			byte[] mission = System.Text.Encoding.ASCII.GetBytes("Mission");
-
 			using(FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read))
 			{
 				using(BinaryReader br = new BinaryReader(fs))
@@ -240,15 +237,15 @@ namespace BZLauncher
 					List<byte> bytes = br.ReadBytes((int)fs.Length).ToList();
 					
 					// don't check the last 6 bytes. "Mission" is 7 bytes
-					for(int i = 0; i < bytes.Count - (mission.Length - 1); ++i)
+					for(int i = 0; i < bytes.Count - (MISSION_BYTES.Length - 1); ++i)
 					{
-						if(bytes[i] == mission[0])
+						if(bytes[i] == MISSION_BYTES[0])
 						{
 							bool foundMission = true;
 
-							for(int j = 1; j < mission.Length; ++j)
+							for(int j = 1; j < MISSION_BYTES.Length; ++j)
 							{
-								if(bytes[i + j] != mission[j])
+								if(bytes[i + j] != MISSION_BYTES[j])
 								{
 									foundMission = false;
 									break;

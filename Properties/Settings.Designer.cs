@@ -23,12 +23,15 @@ namespace BZLauncher.Properties {
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string BzonePath {
             get {
                 return ((string)(this["BzonePath"]));
+            }
+            set {
+                this["BzonePath"] = value;
             }
         }
     }

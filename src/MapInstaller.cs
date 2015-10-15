@@ -10,7 +10,7 @@ namespace BZLauncher
 	public class MapInstaller
 	{
 		public delegate void LoadMapsSignal(string path);
-		public event LoadMapsSignal loadMapsSignal;
+		public static event LoadMapsSignal loadMapsSignal;
 		
 		public MapInstaller(string zipFile)
 		{
@@ -19,13 +19,11 @@ namespace BZLauncher
 			FileAttributes attribs = File.GetAttributes(zipFile);
 
 			// is this an existing zip file?
-			if(File.Exists(zipFile) && attribs == FileAttributes.Compressed || attribs == FileAttributes.Archive)
-			{
-				ThreadPool.QueueUserWorkItem((o) => InstallMap(zipFile, addonPath, loadMapsSignal));
-			}
+			if(File.Exists(zipFile) && (attribs == FileAttributes.Compressed || attribs == FileAttributes.Archive))
+				ThreadPool.QueueUserWorkItem(o => InstallMap(zipFile, addonPath));
 		}
 
-		private static void InstallMap(string zipFile, string dest, LoadMapsSignal signal)
+		private static void InstallMap(string zipFile, string dest)
 		{
 			try
 			{
@@ -38,15 +36,11 @@ namespace BZLauncher
 					{
 						// Are the map files already in a folder in the zip?
 						if(e.FullName.LastIndexOfAny(new char[] { '/', '\\' }) != -1)
-						{
 							mapFilesInFolder = true;
-						}
 
 						// does it have a BZ map file?
 						if(e.Name.Contains("bzn"))
-						{
 							bznName = Path.GetFileNameWithoutExtension(e.Name);
-						}
 					}
 
 					if(bznName == null)
@@ -85,7 +79,7 @@ namespace BZLauncher
 						zip.ExtractToDirectory(mapDir);
 					}
 
-					signal.Invoke(mapDir);
+					loadMapsSignal.Invoke(mapDir);
 				}
 			}
 			catch(Exception)

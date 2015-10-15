@@ -20,7 +20,7 @@ namespace BZLauncher
 			bool? result = dialog.ShowDialog();
 
 			if(result == true)
-				return dialog.FileName;
+                return Properties.Settings.Default.BzonePath = dialog.FileName.Substring(0, dialog.FileName.LastIndexOfAny(new char[] { '/', '\\' }));
 			else
 				return null;
 		}

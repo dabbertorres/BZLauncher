@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -9,24 +8,26 @@ namespace BZLauncher
 	{
 		private App app;
 
-		private List<Map> displayMaps;
-
-		private object loadingMaps = new object();
-
 		public MainWindow()
 		{
 			InitializeComponent();
 
 			app = (App)Application.Current;
 
-			listBox.ItemsSource = displayMaps = app.LoadMaps();
+			app.LoadMaps();
+            listBox.ItemsSource = app.Maps;
+
+			Title = "BZLauncher - " + app.DirectoryPath;
+
+			// update the window title to any changed BZ directory
+			app.bzonePathChanged += path => Title = "BZLauncher - " + path;
         }
 
 		private void MapSelectedChange(object sender, SelectionChangedEventArgs e)
 		{
 			if(0 <= listBox.SelectedIndex && listBox.SelectedIndex < app.Maps.Count)
 			{
-				Map toLoad = displayMaps.ElementAt(listBox.SelectedIndex);
+				Map toLoad = listBox.ItemsSource.Cast<Map>().ElementAt(listBox.SelectedIndex);
 
 				mapImage.Source = toLoad.Image();
 				mapObjectiveTextBlock.Text = toLoad.Objective();
@@ -60,13 +61,9 @@ namespace BZLauncher
 		private void MapNameSearch(object sender, TextChangedEventArgs e)
 		{
 			if(mapNameSearch.Text.Length != 0)
-			{
-				listBox.ItemsSource = displayMaps = app.Maps.FindAll((Map m) => m.filename.Contains(mapNameSearch.Text));
-			}
+				listBox.ItemsSource = app.Maps.Where(m => m.filename.Contains(mapNameSearch.Text));
 			else
-			{
-				listBox.ItemsSource = displayMaps = app.Maps;
-			}
+				listBox.ItemsSource = app.Maps;
 
 			e.Handled = true;
 		}
@@ -74,13 +71,9 @@ namespace BZLauncher
 		private void MapAuthorSearch(object sender, TextChangedEventArgs e)
 		{
 			if(mapAuthorSearch.Text.Length != 0)
-			{
-				listBox.ItemsSource = displayMaps = app.Maps.FindAll((Map m) => m.author.Contains(mapAuthorSearch.Text));
-			}
+				listBox.ItemsSource = app.Maps.Where(m => m.author.Contains(mapAuthorSearch.Text));
 			else
-			{
-				listBox.ItemsSource = displayMaps = app.Maps;
-			}
+				listBox.ItemsSource = app.Maps;
 
 			e.Handled = true;
 		}
@@ -90,22 +83,12 @@ namespace BZLauncher
 			if(e.Data.GetDataPresent(DataFormats.FileDrop))
 			{
 				string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-
+				
 				// get zip file, make new folder with zip file name, and extract contents to new folder
 				foreach(string f in files)
 				{
-					new MapInstaller(f).loadMapsSignal += (string path) =>
-					{
-						Dispatcher.Invoke(() =>
-						{
-							lock (loadingMaps)
-							{
-								app.LoadMapAt(path);
-								listBox.ItemsSource = displayMaps = app.Maps;
-							}
-						});
-					};
-				}
+					new MapInstaller(f);
+                }
 
 				e.Handled = true;
 			}
@@ -121,10 +104,15 @@ namespace BZLauncher
 		private void ChangeBzonePathClick(object sender, RoutedEventArgs e)
 		{
 			string path = FindBzExeDialog.GetPath();
-			app.DirectoryPath = path.Substring(0, path.LastIndexOfAny(new char[] { '/', '\\' }));
 
-			RefreshMapListClick(null, e);
+			if(path != null && path.Length != 0)
+			{
+				app.DirectoryPath = path;
+				Properties.Settings.Default.Save();
 
+				RefreshMapListClick(this, e);
+			}
+			
 			e.Handled = true;
         }
 
@@ -137,13 +125,15 @@ namespace BZLauncher
 
 		private void RefreshMapListClick(object sender, RoutedEventArgs e)
 		{
-			Dispatcher.Invoke(() =>
-			{
-				lock (loadingMaps)
-				{
-					listBox.ItemsSource = displayMaps = app.LoadMaps();
-				}
-			});
+			// clear search boxes
+			mapNameSearch.Text = "";
+			mapAuthorSearch.Text = "";
+
+			app.LoadMaps();
+
+			// stupid workaround since ListBox doesn't have a sort of "requery ItemsSource" functionality
+			listBox.ItemsSource = null;
+			listBox.ItemsSource = app.Maps;
 
 			e.Handled = true;
 		}
