@@ -34,5 +34,65 @@ namespace BZLauncher.Properties {
                 this["BzonePath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("00:00:00")]
+        public global::System.TimeSpan TimePlayed {
+            get {
+                return ((global::System.TimeSpan)(this["TimePlayed"]));
+            }
+            set {
+                this["TimePlayed"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool EditOn {
+            get {
+                return ((bool)(this["EditOn"]));
+            }
+            set {
+                this["EditOn"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool StartEditOn {
+            get {
+                return ((bool)(this["StartEditOn"]));
+            }
+            set {
+                this["StartEditOn"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool WindowModeOn {
+            get {
+                return ((bool)(this["WindowModeOn"]));
+            }
+            set {
+                this["WindowModeOn"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool NoIntroOn {
+            get {
+                return ((bool)(this["NoIntroOn"]));
+            }
+            set {
+                this["NoIntroOn"] = value;
+            }
+        }
     }
 }

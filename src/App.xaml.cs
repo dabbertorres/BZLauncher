@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -7,7 +9,7 @@ using Microsoft.Win32;
 
 namespace BZLauncher
 {
-	public partial class App : Application
+	public sealed partial class App : Application, IDisposable
 	{
 		// notify listeners about BZ Path change
 		public delegate void BzonePathChanged(string path);
@@ -16,7 +18,9 @@ namespace BZLauncher
 		private const string BZ_REG_KEY = "SOFTWARE\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{B3B61934-313A-44A2-B589-700FDAA6C758}_is1";
 
 		private readonly byte[] MISSION_BYTES = System.Text.Encoding.ASCII.GetBytes("Mission");
-		
+
+		private Process bzoneProcess;
+
 		private string bzDirectoryPath;
 		private string bzExePath;
 		private string bzAddonPath;
@@ -39,6 +43,11 @@ namespace BZLauncher
             }
 		}
 
+		public string BzoneExe
+		{
+			get { return bzExePath; }
+		}
+
 		public string AddonPath
 		{
 			get { return bzAddonPath; }
@@ -51,6 +60,9 @@ namespace BZLauncher
 
 		public App()
 		{
+			// listen for our exit event to save any changed settings
+			Exit += (s, args) => BZLauncher.Properties.Settings.Default.Save();
+			
 			// listen for newly installed maps
 			MapInstaller.loadMapsSignal += LoadMaps;
 
@@ -100,6 +112,16 @@ namespace BZLauncher
 			}
 
 			maps = new List<Map>();
+
+			bzoneProcess = new Process();
+			bzoneProcess.Exited += (s, args) =>
+            {
+				BZLauncher.Properties.Settings.Default.TimePlayed += bzoneProcess.ExitTime - bzoneProcess.StartTime;
+
+				int totalTime = BZLauncher.Properties.Settings.Default.TimePlayed.Days * 24 + BZLauncher.Properties.Settings.Default.TimePlayed.Hours;
+
+				MessageBox.Show("Time played: " + totalTime + " hours", "Time Played", MessageBoxButton.OK);
+			};
 		}
 
 		public void LoadMaps(string path = null)
@@ -117,6 +139,18 @@ namespace BZLauncher
 
 			// alphabetical order
 			maps.Sort((one, two) => one.CompareTo(two));
+		}
+
+		public void LaunchBzone(string args)
+		{
+			bzoneProcess.StartInfo.FileName = bzExePath;
+			bzoneProcess.StartInfo.UseShellExecute = false;
+			bzoneProcess.StartInfo.WorkingDirectory = bzDirectoryPath;
+			bzoneProcess.EnableRaisingEvents = true;
+
+			bzoneProcess.StartInfo.Arguments = args;
+
+			bzoneProcess.Start();
 		}
 
 		private void FindMapsInDir(string path, CountdownEvent cntDwn)
@@ -292,6 +326,11 @@ namespace BZLauncher
 					}
 				}
 			}
+		}
+
+		public void Dispose()
+		{
+			((IDisposable)bzoneProcess).Dispose();
 		}
 	}
 }

@@ -21,11 +21,17 @@ namespace BZLauncher
 
 			// update the window title to any changed BZ directory
 			app.bzonePathChanged += path => Title = "BZLauncher - " + path;
-        }
+
+			// set launch settings to previous settings
+			checkBoxEdit.IsChecked = Properties.Settings.Default.EditOn;
+			checkBoxStartEdit.IsChecked = Properties.Settings.Default.StartEditOn;
+			checkBoxWindowMode.IsChecked = Properties.Settings.Default.WindowModeOn;
+			checkBoxNoIntro.IsChecked = Properties.Settings.Default.NoIntroOn;
+		}
 
 		private void MapSelectedChange(object sender, SelectionChangedEventArgs e)
 		{
-			if(0 <= listBox.SelectedIndex && listBox.SelectedIndex < app.Maps.Count)
+			if(listBox.SelectedIndex != -1)
 			{
 				Map toLoad = listBox.ItemsSource.Cast<Map>().ElementAt(listBox.SelectedIndex);
 
@@ -40,20 +46,6 @@ namespace BZLauncher
 				mapTypeOutput.Content = toLoad.type == Map.Type.InstantAction ? "Instant Action" : toLoad.type.ToString();
 				mapVersionOutput.Content = toLoad.version;
 			}
-
-			e.Handled = true;
-		}
-
-		private void EditChecked(object sender, RoutedEventArgs e)
-		{
-			checkBoxStartEditOn.IsEnabled = true;
-
-			e.Handled = true;
-		}
-
-		private void EditUnchecked(object sender, RoutedEventArgs e)
-		{
-			checkBoxStartEditOn.IsEnabled = false;
 
 			e.Handled = true;
 		}
@@ -108,7 +100,6 @@ namespace BZLauncher
 			if(path != null && path.Length != 0)
 			{
 				app.DirectoryPath = path;
-				Properties.Settings.Default.Save();
 
 				RefreshMapListClick(this, e);
 			}
@@ -131,11 +122,93 @@ namespace BZLauncher
 
 			app.LoadMaps();
 
-			// stupid workaround since ListBox doesn't have a sort of "requery ItemsSource" functionality
+			// stupid workaround since ListBox doesn't have its own sort of "refresh ItemsSource" functionality
 			listBox.ItemsSource = null;
 			listBox.ItemsSource = app.Maps;
 
 			e.Handled = true;
 		}
-    }
+
+		private void LaunchMap(object sender, RoutedEventArgs e)
+		{
+			if(listBox.SelectedIndex != -1)
+			{
+				Map map = listBox.ItemsSource.Cast<Map>().ElementAt(listBox.SelectedIndex);
+				
+				string arguments = "";
+
+				if(checkBoxEdit.IsChecked == true)
+				{
+					if(checkBoxStartEdit.IsChecked == true)
+						arguments += "/startedit ";
+					else
+						arguments += "/edit ";
+				}
+
+				if(checkBoxWindowMode.IsChecked == true)
+					arguments += "/win ";
+
+				if(checkBoxNoIntro.IsChecked == true)
+					arguments += "/nointro ";
+
+				arguments += map.filename + ".bzn";
+
+				app.LaunchBzone(arguments);
+			}
+
+			e.Handled = true;
+		}
+
+		private void EditChecked(object sender, RoutedEventArgs e)
+		{
+			checkBoxStartEdit.IsEnabled = true;
+
+			Properties.Settings.Default.EditOn = true;
+			e.Handled = true;
+		}
+
+		private void EditUnchecked(object sender, RoutedEventArgs e)
+		{
+			checkBoxStartEdit.IsEnabled = false;
+
+			Properties.Settings.Default.EditOn = false;
+			e.Handled = true;
+		}
+
+		private void StartEditChecked(object sender, RoutedEventArgs e)
+		{
+			Properties.Settings.Default.StartEditOn = true;
+			e.Handled = true;
+		}
+
+		private void StartEditUnchecked(object sender, RoutedEventArgs e)
+		{
+			Properties.Settings.Default.StartEditOn = false;
+			e.Handled = true;
+		}
+
+		private void WindowModeChecked(object sender, RoutedEventArgs e)
+		{
+			Properties.Settings.Default.WindowModeOn = true;
+			e.Handled = true;
+		}
+
+		private void WindowModeUnchecked(object sender, RoutedEventArgs e)
+		{
+			Properties.Settings.Default.WindowModeOn = false;
+			e.Handled = true;
+		}
+
+		private void NoIntroChecked(object sender, RoutedEventArgs e)
+		{
+			Properties.Settings.Default.NoIntroOn = true;
+			e.Handled = true;
+		}
+
+		private void NoIntroUnchecked(object sender, RoutedEventArgs e)
+		{
+			Properties.Settings.Default.NoIntroOn = false;
+			e.Handled = true;
+		}
+	}
 }

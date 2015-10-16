@@ -9,11 +9,11 @@
         Title="BZLauncher" Height="600" Width="800" Visibility="Visible">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*"/>
-            <ColumnDefinition Width="2*"/>
-            <ColumnDefinition Width="3*"/>
-            <ColumnDefinition Width="0.9*"/>
-            <ColumnDefinition Width="1.1*"/>
+            <ColumnDefinition Width="176*"/>
+            <ColumnDefinition Width="176*"/>
+            <ColumnDefinition Width="264*"/>
+            <ColumnDefinition Width="79*"/>
+            <ColumnDefinition Width="97*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -31,7 +31,7 @@
             </MenuItem>
         </Menu>
         <ListBox x:Name="listBox" Margin="10,10,10,10" Grid.Row="1" Grid.Column="0" Grid.RowSpan="2" HorizontalAlignment="Stretch" SelectionChanged="MapSelectedChange" SelectionMode="Single" AllowDrop="True" Drop="ListBoxDrop"/>
-        <Image x:Name="mapImage" Margin="10,10,10,10" Grid.Row="1" Grid.Column="2"/>
+        <Image x:Name="mapImage" Margin="10" Grid.Row="1" Grid.Column="2"/>
         <StackPanel Margin="10,10,0,10" Grid.Row="1" Grid.Column="3">
             <Label x:Name="mapInfo" Content="Map Info" TextElement.FontWeight="Bold" HorizontalContentAlignment="Center"/>
             <Label x:Name="mapAuthor" Content="Author: " Padding="2" HorizontalContentAlignment="Right"/>
@@ -70,14 +70,17 @@
                 </TextBox>
             </AdornerDecorator>
         </StackPanel>
-        <StackPanel Margin="10,10,10,10" Grid.Row="2" Grid.Column="3" VerticalAlignment="Bottom" Grid.ColumnSpan="2" HorizontalAlignment="Right">
-            <CheckBox x:Name="checkBoxEditOn" Content="Edit" Margin="0,0,0,5" Checked="EditChecked" Unchecked="EditUnchecked"/>
-            <CheckBox x:Name="checkBoxStartEditOn" Content="Start Edit" Margin="0,0,0,5" IsEnabled="False"/>
-            <Button x:Name="button" Content="Launch"/>
-        </StackPanel>
         <DockPanel Grid.Column="2" Margin="10" Grid.Row="2" UseLayoutRounding="False">
             <Label x:Name="mapObjectiveLabel" Content="Objective:" Padding="2" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Disabled" VerticalAlignment="Top" DockPanel.Dock="Top"/>
             <TextBox x:Name="mapObjectiveTextBlock" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" BorderThickness="0" IsTabStop="False" AllowDrop="False" UndoLimit="0" IsReadOnly="True" ScrollViewer.CanContentScroll="True" ClipToBounds="True" UseLayoutRounding="False" Margin="0"/>
         </DockPanel>
+        <StackPanel Margin="10,10,10,10" Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="2">
+            <Label Content="Launch Settings:" Padding="2" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" Margin="0,0,0,5"/>
+            <CheckBox x:Name="checkBoxEdit" Content="Edit" Margin="0,0,0,5" Checked="EditChecked" Unchecked="EditUnchecked" HorizontalAlignment="Left" Padding="4,0,0,0"/>
+            <CheckBox x:Name="checkBoxStartEdit" Content="Start Edit" Margin="0,0,0,5" IsEnabled="False" Padding="4,0,0,0" HorizontalAlignment="Center" Checked="StartEditChecked" Unchecked="StartEditUnchecked"/>
+            <CheckBox x:Name="checkBoxWindowMode" Content="Windowed" Margin="0,0,0,5" Padding="4,0,0,0" Unchecked="WindowModeUnchecked" Checked="WindowModeChecked"/>
+            <CheckBox x:Name="checkBoxNoIntro" Content="No Intro" Margin="0,0,0,5" Padding="4,0,0,0" Checked="NoIntroChecked" Unchecked="NoIntroUnchecked"/>
+        </StackPanel>
+        <Button x:Name="button" Content="Launch" Click="LaunchMap" Margin="10,0,10,10" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="4" Grid.Row="2" VerticalAlignment="Bottom" Height="20"/>
     </Grid>
 </Window>
