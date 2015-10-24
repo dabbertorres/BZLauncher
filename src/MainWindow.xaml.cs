@@ -15,7 +15,7 @@ namespace BZLauncher
 			app = (App)Application.Current;
 
 			app.LoadMaps();
-            listBox.ItemsSource = app.Maps;
+			listBox.ItemsSource = app.Maps;
 
 			Title = "BZLauncher - " + app.DirectoryPath;
 
@@ -75,12 +75,12 @@ namespace BZLauncher
 			if(e.Data.GetDataPresent(DataFormats.FileDrop))
 			{
 				string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-				
+
 				// get zip file, make new folder with zip file name, and extract contents to new folder
 				foreach(string f in files)
 				{
 					new MapInstaller(f);
-                }
+				}
 
 				e.Handled = true;
 			}
@@ -103,9 +103,9 @@ namespace BZLauncher
 
 				RefreshMapListClick(this, e);
 			}
-			
+
 			e.Handled = true;
-        }
+		}
 
 		private void AboutClick(object sender, RoutedEventArgs e)
 		{
@@ -134,7 +134,7 @@ namespace BZLauncher
 			if(listBox.SelectedIndex != -1)
 			{
 				Map map = listBox.ItemsSource.Cast<Map>().ElementAt(listBox.SelectedIndex);
-				
+
 				string arguments = "";
 
 				if(checkBoxEdit.IsChecked == true)

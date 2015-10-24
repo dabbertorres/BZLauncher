@@ -14,7 +14,7 @@ namespace BZLauncher
 		// notify listeners about BZ Path change
 		public delegate void BzonePathChanged(string path);
 		public event BzonePathChanged bzonePathChanged;
-		
+
 		private const string BZ_REG_KEY = "SOFTWARE\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{B3B61934-313A-44A2-B589-700FDAA6C758}_is1";
 
 		private readonly byte[] MISSION_BYTES = System.Text.Encoding.ASCII.GetBytes("Mission");
@@ -40,7 +40,7 @@ namespace BZLauncher
 
 				if(bzonePathChanged != null)
 					bzonePathChanged.Invoke(bzDirectoryPath);
-            }
+			}
 		}
 
 		public string BzoneExe
@@ -62,7 +62,7 @@ namespace BZLauncher
 		{
 			// listen for our exit event to save any changed settings
 			Exit += (s, args) => BZLauncher.Properties.Settings.Default.Save();
-			
+
 			// listen for newly installed maps
 			MapInstaller.loadMapsSignal += LoadMaps;
 
@@ -92,7 +92,7 @@ namespace BZLauncher
 				if(BZLauncher.Properties.Settings.Default.BzonePath.LastIndexOf('.') >= BZLauncher.Properties.Settings.Default.BzonePath.Length - 5)
 					BZLauncher.Properties.Settings.Default.BzonePath = BZLauncher.Properties.Settings.Default.BzonePath.Substring(0, BZLauncher.Properties.Settings.Default.BzonePath.LastIndexOfAny(new char[] { '/', '\\' }));
 
-                DirectoryPath = BZLauncher.Properties.Settings.Default.BzonePath;
+				DirectoryPath = BZLauncher.Properties.Settings.Default.BzonePath;
 
 				promptForPath = false;
 			}
@@ -115,7 +115,7 @@ namespace BZLauncher
 
 			bzoneProcess = new Process();
 			bzoneProcess.Exited += (s, args) =>
-            {
+			{
 				BZLauncher.Properties.Settings.Default.TimePlayed += bzoneProcess.ExitTime - bzoneProcess.StartTime;
 
 				int totalTime = BZLauncher.Properties.Settings.Default.TimePlayed.Days * 24 + BZLauncher.Properties.Settings.Default.TimePlayed.Hours;
@@ -141,7 +141,7 @@ namespace BZLauncher
 			// reloading from addon path
 			if(path == null)
 				maps.Clear();
-			
+
 			// block until all Threads finish
 			using(CountdownEvent cntDwn = new CountdownEvent(1))
 			{
@@ -156,7 +156,7 @@ namespace BZLauncher
 		private void FindMapsInDir(string path, CountdownEvent cntDwn)
 		{
 			var dirs = Directory.EnumerateDirectories(path);
-			
+
 			foreach(string d in dirs)
 			{
 				cntDwn.AddCount();
@@ -169,7 +169,7 @@ namespace BZLauncher
 			{
 				Map m = LoadMap(b.Substring(0, b.LastIndexOf('.')));
 
-				lock(MAPS_LOCK)
+				lock (MAPS_LOCK)
 				{
 					if(m != null)
 						maps.Add(m);
@@ -186,9 +186,9 @@ namespace BZLauncher
 			string bznFile = path + ".bzn";
 
 			Map ret = new Map();
-			ret.bznPath = path.Substring(0, path.LastIndexOfAny(new char[] {'/', '\\'}));
+			ret.bznPath = path.Substring(0, path.LastIndexOfAny(new char[] { '/', '\\' }));
 			ret.filename = Path.GetFileNameWithoutExtension(path);
-			
+
 			if(File.Exists(desFile))
 				ParseDes(desFile, ret);
 			else if(File.Exists(trnFile))
@@ -259,7 +259,7 @@ namespace BZLauncher
 
 		private void ParseTrn(string file, Map map)
 		{
-			
+
 		}
 
 		private void ParseBzn(string file, Map map)
@@ -269,7 +269,7 @@ namespace BZLauncher
 				using(BinaryReader br = new BinaryReader(fs))
 				{
 					List<byte> bytes = br.ReadBytes((int)fs.Length).ToList();
-					
+
 					// don't check the last 6 bytes. "Mission" is 7 bytes
 					for(int i = 0; i < bytes.Count - (MISSION_BYTES.Length - 1); ++i)
 					{

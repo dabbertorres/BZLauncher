@@ -14,7 +14,7 @@ namespace BZLauncher
 			InstantAction,
 			Unknown,
 		}
-		
+
 		// path to folder containing map files
 		public string bznPath;
 

@@ -7,7 +7,7 @@ namespace Directories
 		public class Directory
 		{
 			public readonly string guid;
-			
+
 			public static Directory Contacts = new Directory("{56784854-C6CB-462B-8169-88E350ACB882}");
 			public static Directory Desktop = new Directory("{B4BFCC3A-DB2C-424C-B029-7FE99A87C641}");
 			public static Directory Documents = new Directory("{FDD39AD0-238F-46AF-ADB4-6C85480369C7}");

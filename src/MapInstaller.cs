@@ -12,7 +12,7 @@ namespace BZLauncher
 	{
 		public delegate void LoadMapsSignal(string path);
 		public static event LoadMapsSignal loadMapsSignal;
-		
+
 		public MapInstaller(string zipFile)
 		{
 			string addonPath = ((App)Application.Current).AddonPath;
@@ -60,14 +60,14 @@ namespace BZLauncher
 						// map directory already exists!
 						if(di.EnumerateFiles().Count() != 0)
 							throw new IOException("A directory for this map already exists.");
-						
+
 						extractZip(zip, mapDir, mapFilesInFolder);
 					}
 					catch(UnauthorizedAccessException)
 					{
 						string newDest = Directories.User.get(Directories.User.Directory.Downloads) + bznName;
 						Directory.CreateDirectory(newDest);
-                        extractZip(zip, newDest, mapFilesInFolder);
+						extractZip(zip, newDest, mapFilesInFolder);
 
 						// since we don't have access to BZ folder as current user, use cmd's move command as admin to
 						// put the map in the right spot
@@ -97,7 +97,7 @@ namespace BZLauncher
 			{
 				MessageBox.Show("Could not open \"" + zipFile + "\" as a map archive.", "Error");
 			}
-        }
+		}
 
 		private static void extractZip(ZipArchive zip, string destination, bool mapFilesInFolder)
 		{
