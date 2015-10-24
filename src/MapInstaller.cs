@@ -20,7 +20,7 @@ namespace BZLauncher
 			FileAttributes attribs = File.GetAttributes(zipFile);
 
 			// is this an existing zip file?
-			if(File.Exists(zipFile) && (attribs == FileAttributes.Compressed || attribs == FileAttributes.Archive))
+			if(File.Exists(zipFile) && ((attribs & FileAttributes.Compressed) != 0 || (attribs & FileAttributes.Archive) != 0))
 				ThreadPool.QueueUserWorkItem(o => InstallMap(zipFile, addonPath));
 		}
 
@@ -40,7 +40,7 @@ namespace BZLauncher
 							mapFilesInFolder = true;
 
 						// does it have a BZ map file?
-						if(e.Name.Contains("bzn"))
+						if(e.Name.Contains("bzn") || e.Name.Contains("BZN"))
 							bznName = Path.GetFileNameWithoutExtension(e.Name);
 					}
 
