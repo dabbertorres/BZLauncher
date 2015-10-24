@@ -111,6 +111,7 @@
     <Compile Include="src\FindBzExeDialog.cs" />
     <Compile Include="src\Map.cs" />
     <Compile Include="src\MapInstaller.cs" />
+    <Compile Include="src\Directories\User.cs" />
     <Compile Include="src\Watermark\WatermarkAdorner.cs" />
     <Compile Include="src\Watermark\WatermarkService.cs" />
     <Page Include="src\MainWindow.xaml">

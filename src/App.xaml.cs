@@ -104,7 +104,7 @@ namespace BZLauncher
 
 				if(path == null)
 				{
-					MessageBox.Show("No path, exiting.");
+					MessageBox.Show("No path selected or found, exiting.");
 					Shutdown();
 				}
 
@@ -124,6 +124,18 @@ namespace BZLauncher
 			};
 		}
 
+		public void LaunchBzone(string args)
+		{
+			bzoneProcess.StartInfo.FileName = bzExePath;
+			bzoneProcess.StartInfo.UseShellExecute = false;
+			bzoneProcess.StartInfo.WorkingDirectory = bzDirectoryPath;
+			bzoneProcess.EnableRaisingEvents = true;
+
+			bzoneProcess.StartInfo.Arguments = args;
+
+			bzoneProcess.Start();
+		}
+
 		public void LoadMaps(string path = null)
 		{
 			// reloading from addon path
@@ -139,18 +151,6 @@ namespace BZLauncher
 
 			// alphabetical order
 			maps.Sort((one, two) => one.CompareTo(two));
-		}
-
-		public void LaunchBzone(string args)
-		{
-			bzoneProcess.StartInfo.FileName = bzExePath;
-			bzoneProcess.StartInfo.UseShellExecute = false;
-			bzoneProcess.StartInfo.WorkingDirectory = bzDirectoryPath;
-			bzoneProcess.EnableRaisingEvents = true;
-
-			bzoneProcess.StartInfo.Arguments = args;
-
-			bzoneProcess.Start();
 		}
 
 		private void FindMapsInDir(string path, CountdownEvent cntDwn)

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.IO;
 using System.IO.Compression;
@@ -51,32 +52,42 @@ namespace BZLauncher
 					}
 
 					string mapDir = dest + "/" + bznName;
-					DirectoryInfo di = Directory.CreateDirectory(mapDir);
 
-					if(!di.Exists)
+					try
 					{
-						// couldn't create directory for map!
-						MessageBox.Show("Could not create directory for the map, is your BZ directory in Program Files? Try running as administrator.", "Error");
-						return;
-					}
+						DirectoryInfo di = Directory.CreateDirectory(mapDir);
 
-					if(di.EnumerateFiles().Count() != 0)
-					{
 						// map directory already exists!
-						MessageBox.Show("A directory for this map already exists!", "Error");
-						return;
+						if(di.EnumerateFiles().Count() != 0)
+							throw new IOException("A directory for this map already exists.");
+						
+						extractZip(zip, mapDir, mapFilesInFolder);
 					}
-
-					if(mapFilesInFolder)
+					catch(UnauthorizedAccessException)
 					{
-						foreach(ZipArchiveEntry e in zip.Entries)
+						string newDest = Directories.User.get(Directories.User.Directory.Downloads) + bznName;
+						Directory.CreateDirectory(newDest);
+                        extractZip(zip, newDest, mapFilesInFolder);
+
+						// since we don't have access to BZ folder as current user, use cmd's move command as admin to
+						// put the map in the right spot
+						using(Process move = new Process())
 						{
-							e.ExtractToFile(mapDir + "/" + e.Name);
+							move.StartInfo.FileName = "cmd";
+							move.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+							move.StartInfo.CreateNoWindow = true;
+							move.StartInfo.UseShellExecute = true;
+							move.StartInfo.Verb = "runas";
+							move.StartInfo.Arguments = "move /Y " + newDest + ' ' + mapDir;
+
+							move.Start();
+							move.WaitForExit();
 						}
 					}
-					else
+					catch(IOException ioe)
 					{
-						zip.ExtractToDirectory(mapDir);
+						MessageBox.Show(ioe.Message, "Error");
+						return;
 					}
 
 					loadMapsSignal.Invoke(mapDir);
@@ -87,5 +98,20 @@ namespace BZLauncher
 				MessageBox.Show("Could not open \"" + zipFile + "\" as a map archive.", "Error");
 			}
         }
+
+		private static void extractZip(ZipArchive zip, string destination, bool mapFilesInFolder)
+		{
+			if(mapFilesInFolder)
+			{
+				foreach(ZipArchiveEntry e in zip.Entries)
+				{
+					e.ExtractToFile(destination + "/" + e.Name);
+				}
+			}
+			else
+			{
+				zip.ExtractToDirectory(destination);
+			}
+		}
 	}
 }
